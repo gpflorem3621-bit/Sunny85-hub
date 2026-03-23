@@ -1,0 +1,158 @@
+main.lua--// 🌞 Sunny85 Hub (Executor Version)
+
+local player = game.Players.LocalPlayer
+local TweenService = game:GetService("TweenService")
+local UIS = game:GetService("UserInputService")
+
+--// GUI
+local gui = Instance.new("ScreenGui")
+pcall(function() gui.Parent = game.CoreGui end)
+
+--// MAIN
+local main = Instance.new("Frame", gui)
+main.Size = UDim2.new(0,0,0,0)
+main.Position = UDim2.new(0.5,-220,0.5,-160)
+main.BackgroundColor3 = Color3.fromRGB(15,15,25)
+main.Active = true
+main.Draggable = true
+
+-- Glow
+local stroke = Instance.new("UIStroke", main)
+stroke.Color = Color3.fromRGB(0,170,255)
+stroke.Thickness = 2
+
+-- Animate open
+TweenService:Create(main, TweenInfo.new(0.5), {
+	Size = UDim2.new(0,440,0,320)
+}):Play()
+
+-- Anime BG
+local bg = Instance.new("ImageLabel", main)
+bg.Size = UDim2.new(1,0,1,0)
+bg.Image = "rbxassetid://11645926716"
+bg.ImageTransparency = 0.6
+bg.BackgroundTransparency = 1
+
+-- Title
+local title = Instance.new("TextLabel", main)
+title.Size = UDim2.new(1,0,0,40)
+title.Text = "🌞 Sunny85 Hub"
+title.TextScaled = true
+title.BackgroundTransparency = 1
+title.TextColor3 = Color3.fromRGB(0,200,255)
+
+--// KEY SYSTEM
+local keyFrame = Instance.new("Frame", main)
+keyFrame.Size = UDim2.new(1,0,1,0)
+keyFrame.BackgroundTransparency = 1
+
+local keyBox = Instance.new("TextBox", keyFrame)
+keyBox.Size = UDim2.new(0.6,0,0,40)
+keyBox.Position = UDim2.new(0.2,0,0.3,0)
+keyBox.PlaceholderText = "Enter any key..."
+
+local unlock = Instance.new("TextButton", keyFrame)
+unlock.Size = UDim2.new(0.4,0,0,40)
+unlock.Position = UDim2.new(0.3,0,0.5,0)
+unlock.Text = "Unlock"
+unlock.BackgroundColor3 = Color3.fromRGB(0,170,255)
+
+--// MENU
+local menu = Instance.new("Frame", main)
+menu.Size = UDim2.new(1,0,1,0)
+menu.Visible = false
+menu.BackgroundTransparency = 1
+
+-- Inputs
+local speedBox = Instance.new("TextBox", menu)
+speedBox.Position = UDim2.new(0.1,0,0.2,0)
+speedBox.Size = UDim2.new(0.35,0,0,35)
+speedBox.PlaceholderText = "Speed (0-300)"
+
+local jumpBox = Instance.new("TextBox", menu)
+jumpBox.Position = UDim2.new(0.55,0,0.2,0)
+jumpBox.Size = UDim2.new(0.35,0,0,35)
+jumpBox.PlaceholderText = "Jump (0-150)"
+
+-- Apply
+local apply = Instance.new("TextButton", menu)
+apply.Size = UDim2.new(0.5,0,0,40)
+apply.Position = UDim2.new(0.25,0,0.4,0)
+apply.Text = "Apply"
+apply.BackgroundColor3 = Color3.fromRGB(0,170,255)
+
+-- Teleports
+local pirateBtn = Instance.new("TextButton", menu)
+pirateBtn.Size = UDim2.new(0.35,0,0,40)
+pirateBtn.Position = UDim2.new(0.1,0,0.65,0)
+pirateBtn.Text = "Pirate"
+
+local marineBtn = Instance.new("TextButton", menu)
+marineBtn.Size = UDim2.new(0.35,0,0,40)
+marineBtn.Position = UDim2.new(0.55,0,0.65,0)
+marineBtn.Text = "Marine"
+
+-- Unlock
+unlock.MouseButton1Click:Connect(function()
+	if keyBox.Text ~= "" then
+		keyFrame.Visible = false
+		menu.Visible = true
+	end
+end)
+
+-- Values
+local currentSpeed = 16
+local currentJump = 50
+
+-- Apply button
+apply.MouseButton1Click:Connect(function()
+	local speed = tonumber(speedBox.Text)
+	local jump = tonumber(jumpBox.Text)
+
+	if speed then
+		currentSpeed = math.clamp(speed,0,300)
+	end
+
+	if jump then
+		currentJump = math.clamp(jump,0,150)
+	end
+end)
+
+-- LOOP (prevents reset)
+task.spawn(function()
+	while true do
+		task.wait(0.2)
+		local char = player.Character
+		if char and char:FindFirstChild("Humanoid") then
+			local hum = char.Humanoid
+			hum.WalkSpeed = currentSpeed
+			hum.JumpPower = currentJump
+		end
+	end
+end)
+
+-- TELEPORT (strong method)
+local piratePos = CFrame.new(0,10,0)
+local marinePos = CFrame.new(100,10,0)
+
+pirateBtn.MouseButton1Click:Connect(function()
+	local char = player.Character
+	if char and char:FindFirstChild("HumanoidRootPart") then
+		char.HumanoidRootPart.CFrame = piratePos
+	end
+end)
+
+marineBtn.MouseButton1Click:Connect(function()
+	local char = player.Character
+	if char and char:FindFirstChild("HumanoidRootPart") then
+		char.HumanoidRootPart.CFrame = marinePos
+	end
+end)
+
+-- Toggle UI
+UIS.InputBegan:Connect(function(input,gpe)
+	if gpe then return end
+	if input.KeyCode == Enum.KeyCode.RightShift then
+		main.Visible = not main.Visible
+	end
+end)
